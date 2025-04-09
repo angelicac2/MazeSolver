@@ -5,6 +5,9 @@
  */
 
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Stack;
 
 public class MazeSolver {
     private Maze maze;
@@ -27,9 +30,28 @@ public class MazeSolver {
      * @return An arraylist of MazeCells to visit in order
      */
     public ArrayList<MazeCell> getSolution() {
-        // TODO: Get the solution from the maze
-        // Should be from start to end cells
-        return null;
+        // Stack for cells to be inputted in reverse order
+        Stack<MazeCell> reverse = new Stack<>();
+        // ArrayList to make reversed Stack forward
+        ArrayList<MazeCell> forward = new ArrayList<MazeCell>();
+        // New cell being explored
+        MazeCell newCell;
+        // Old cell being explored
+        MazeCell oldCell = maze.getEndCell();
+        reverse.push(oldCell);
+        while (oldCell != maze.getStartCell()) {
+            // Get the parent of the cell that was just explored, assign it as the new cell
+            newCell = oldCell.getParent();
+            // Push this cell into stack
+            reverse.push(newCell);
+            oldCell = newCell;
+        }
+        int size = reverse.size();
+        for (int i = 0; i < size; i++) {
+            // Add cells in forward order with ArrayList by popping LIFO stack that was in reverse order
+            forward.add(reverse.pop());
+        }
+        return forward;
     }
 
     /**
@@ -38,8 +60,42 @@ public class MazeSolver {
      */
     public ArrayList<MazeCell> solveMazeDFS() {
         // TODO: Use DFS to solve the maze
-        // Explore the cells in the order: NORTH, EAST, SOUTH, WEST
-        return null;
+        // Explore the cells in the order: NORTH, EAST, SOUTH, WEST (stack)
+        ArrayList<MazeCell> solveMaze = new ArrayList<MazeCell>();
+        Stack<MazeCell> dfs = new Stack<>();
+        MazeCell newCell = null;
+        dfs.add(maze.getStartCell());
+        while (!(newCell.equals(maze.getEndCell()) && !dfs.isEmpty())) {
+            newCell = dfs.pop();
+            // Look north cell
+            if (maze.isValidCell(newCell.getRow() - 1, newCell.getCol())) {
+                // Add the cell to the stack if it is valid
+                dfs.push(maze.getCell(newCell.getRow() - 1, newCell.getCol()));
+                // Set cell that has just been explored to IsExplored, true
+                maze.getCell(newCell.getRow() - 1, newCell.getCol()).setExplored(true);
+            }
+            // Look east cell
+            else if (maze.isValidCell(newCell.getRow(), newCell.getCol() + 1)) {
+                dfs.push(maze.getCell(newCell.getRow(), newCell.getCol() + 1));
+                maze.getCell(newCell.getRow(), newCell.getCol() + 1).setExplored(true);
+            }
+            // Look south cell
+            else if (maze.isValidCell(newCell.getRow() + 1, newCell.getCol())) {
+                dfs.push(maze.getCell(newCell.getRow() + 1, newCell.getCol()));
+                maze.getCell(newCell.getRow() + 1, newCell.getCol()).setExplored(true);
+            }
+            // Look west cell
+            else if (maze.isValidCell(newCell.getRow(), newCell.getCol() - 1)) {
+                dfs.push(maze.getCell(newCell.getRow(), newCell.getCol() - 1));
+                maze.getCell(newCell.getRow(), newCell.getCol() - 1).setExplored(true);
+            }
+        }
+        for (int i = 0; i < getSolution().size(); i++) {
+            if (dfs.get(i) == getSolution().get(i)) {
+                solveMaze.add(dfs.get(i));
+            }
+        }
+        return solveMaze;
     }
 
     /**
@@ -48,8 +104,36 @@ public class MazeSolver {
      */
     public ArrayList<MazeCell> solveMazeBFS() {
         // TODO: Use BFS to solve the maze
-        // Explore the cells in the order: NORTH, EAST, SOUTH, WEST
-        return null;
+        ArrayList<MazeCell> solveMaze = new ArrayList<MazeCell>();
+        Queue<MazeCell> bfs = new LinkedList<>();
+        MazeCell newCell = null;
+        bfs.add(maze.getStartCell());
+        while (!(newCell == maze.getEndCell()) && !bfs.isEmpty()) {
+            newCell = bfs.peek();
+            // Look north cell
+            if (maze.isValidCell(newCell.getRow() - 1, newCell.getCol())) {
+                // Add the cell to the queue if it is valid
+                bfs.add(maze.getCell(newCell.getRow() - 1, newCell.getCol()));
+                // Set cell that has just been explored to IsExplored, true
+                maze.getCell(newCell.getRow() - 1, newCell.getCol()).setExplored(true);
+            }
+            // Look east cell
+            if (maze.isValidCell(newCell.getRow(), newCell.getCol() + 1)) {
+                bfs.add(maze.getCell(newCell.getRow(), newCell.getCol() + 1));
+                maze.getCell(newCell.getRow(), newCell.getCol() + 1).setExplored(true);
+            }
+            // Look south cell
+            if (maze.isValidCell(newCell.getRow() + 1, newCell.getCol())) {
+                bfs.add(maze.getCell(newCell.getRow() + 1, newCell.getCol()));
+                maze.getCell(newCell.getRow() + 1, newCell.getCol()).setExplored(true);
+            }
+            // Look west cell
+            if (maze.isValidCell(newCell.getRow(), newCell.getCol() - 1)) {
+                bfs.add(maze.getCell(newCell.getRow(), newCell.getCol() - 1));
+                maze.getCell(newCell.getRow(), newCell.getCol() - 1).setExplored(true);
+            }
+        }
+        return solveMaze;
     }
 
     public static void main(String[] args) {

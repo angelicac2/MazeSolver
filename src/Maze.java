@@ -17,6 +17,7 @@ public class Maze {
     private int numCols;
 
     public Maze(String filename) {
+        //MazeCell newMaze = new MazeCell();
         createMaze(filename);
         printMaze();
     }
@@ -146,7 +147,9 @@ public class Maze {
      * @return boolean true/false
      */
     public boolean isValidCell(int row, int col) {
-        // TODO: Complete this function
-        return true;
+        if (!(mazeGrid[row][col].isExplored() && mazeGrid[row][col].isWall())) {
+            return true;
+        }
+        return false;
     }
 }
